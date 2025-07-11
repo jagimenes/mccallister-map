@@ -1,14 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ItineraryResponseDto } from './dto/itinerary-response.dto';
 import { ItineraryDto } from './dto/itinerary-request.dto';
 import { ticketHandlers } from './utils/ticket-handler-map';
 import { randomUUID } from 'node:crypto';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+  Itinerary,
+  ItineraryDocument,
+} from '../database/schemas/itinerary.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ItineraryService {
-  private itineraries: Record<string, ItineraryResponseDto> = {};
+  constructor(
+    @InjectModel(Itinerary.name)
+    private readonly itineraryModel: Model<ItineraryDocument>,
+  ) {}
 
-  createItinerary(tickets: ItineraryDto[]): ItineraryResponseDto {
+  async createItinerary(
+    tickets: ItineraryDto[],
+  ): Promise<ItineraryResponseDto> {
     const sortedTickets = this.sortTickets(tickets);
     const itinerary: ItineraryResponseDto = {
       id: randomUUID(),
@@ -16,15 +27,19 @@ export class ItineraryService {
       humanReadable: this.generateHumanReadable(sortedTickets),
       createdAt: new Date(),
     };
-    this.itineraries[itinerary.id] = itinerary;
+
+    await this.itineraryModel.create(itinerary);
+
     return itinerary;
   }
 
-  getItinerary(id: string): ItineraryResponseDto {
-    const itinerary = this.itineraries[id];
+  async getItinerary(id: string): Promise<ItineraryResponseDto> {
+    const itinerary = await this.itineraryModel.findOne({ id }).lean();
+
     if (!itinerary) {
-      throw new Error('Itinerary not found');
+      throw new NotFoundException(`Itinerary with ID "${id}" not found`);
     }
+
     return itinerary;
   }
 
