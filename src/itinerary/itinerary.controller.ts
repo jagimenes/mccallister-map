@@ -5,11 +5,12 @@ import { ItineraryResponseDto } from './dto/itinerary-response.dto';
 import { ItineraryRequestSchema } from './schemas/itinerary-request.schema';
 import { ZodValidationPipe } from 'src/core/zod-validation.pipe';
 import { itineraryMocks } from './mocks/itinerary.mocks';
+import { ItineraryService } from './itinerary.service';
 
 @ApiTags('Itinerary')
 @Controller('itinerary')
 export class ItineraryController {
-  constructor() {}
+  constructor(private readonly itineraryService: ItineraryService) {}
 
   @Post()
   @ApiOperation({
@@ -34,9 +35,8 @@ export class ItineraryController {
   createItinerary(
     @Body(new ZodValidationPipe(ItineraryRequestSchema))
     body: ItineraryRequestDto,
-  ): string {
+  ): ItineraryResponseDto {
     const { tickets } = body;
-    console.log(tickets);
-    return 'working';
+    return this.itineraryService.createItinerary(tickets);
   }
 }
