@@ -14,6 +14,7 @@ export const itineraryMocks = {
               location: 'Innsbruck Hbf',
             },
             details: {
+              platform: '3',
               number: 'RJX 765',
               seat: '17C',
             },
@@ -32,13 +33,13 @@ export const itineraryMocks = {
             transportType: 'train',
             departure: {
               location: 'St. Anton am Arlberg Bahnhof',
-              platform: '3',
               time: '2023-12-24T08:00:00Z',
             },
             arrival: {
               location: 'Innsbruck Hbf',
             },
             details: {
+              platform: '3',
               number: 'RJX 765',
               seat: '17C',
             },
